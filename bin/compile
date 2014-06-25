@@ -83,30 +83,32 @@ elif test -d $cache_dir/node/node_modules; then
 
 fi
 
+### Comment out by shunjikonishi
 # Handle npm's new cert bug
 # http://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
-if [ ! -f "$build_dir/.npmrc" ]; then
-  status "Writing a custom .npmrc to circumvent npm bugs"
-  echo "ca=" > "$build_dir/.npmrc"
-fi
+### if [ ! -f "$build_dir/.npmrc" ]; then
+###   status "Writing a custom .npmrc to circumvent npm bugs"
+###   echo "ca=" > "$build_dir/.npmrc"
+### fi
 
+### Comment out by shunjikonishi
 # Scope config var availability only to `npm install`
-(
-  if [ -d "$env_dir" ]; then
-    status "Exporting config vars to environment"
-    export_env_dir $env_dir
-  fi
+### (
+###   if [ -d "$env_dir" ]; then
+###     status "Exporting config vars to environment"
+###     export_env_dir $env_dir
+###   fi
 
-  status "Installing dependencies"
-  # Make npm output to STDOUT instead of its default STDERR
-  npm install --userconfig $build_dir/.npmrc 2>&1 | indent
-)
+###   status "Installing dependencies"
+###   # Make npm output to STDOUT instead of its default STDERR
+###   npm install --userconfig $build_dir/.npmrc 2>&1 | indent
+### )
 
 # Persist goodies like node-version in the slug
-mkdir -p $build_dir/.heroku
+### mkdir -p $build_dir/.heroku
 
 # Save resolved node version in the slug for later reference
-echo $node_version > $build_dir/.heroku/node-version
+### echo $node_version > $build_dir/.heroku/node-version
 
 # Purge node-related cached content, being careful not to purge the top-level
 # cache, for the sake of heroku-buildpack-multi apps.
@@ -121,31 +123,31 @@ if test -d $build_dir/node_modules; then
 fi
 
 # Copy goodies to the cache
-cp -r $build_dir/.heroku $cache_dir/node
+### cp -r $build_dir/.heroku $cache_dir/node
 
 status "Cleaning up node-gyp and npm artifacts"
 rm -rf "$build_dir/.node-gyp"
 rm -rf "$build_dir/.npm"
 
 # If Procfile is absent, try to create one using `npm start`
-if [ ! -e $build_dir/Procfile ]; then
-  npm_start=$(cat $build_dir/package.json | $bp_dir/vendor/jq -r .scripts.start)
+### if [ ! -e $build_dir/Procfile ]; then
+###   npm_start=$(cat $build_dir/package.json | $bp_dir/vendor/jq -r .scripts.start)
 
-  # If `scripts.start` is set in package.json, or a server.js file
-  # is present in the app root, then create a default Procfile
-  if [ "$npm_start" != "null" ] || [ -f $build_dir/server.js ]; then
-    status "No Procfile found; Adding npm start to new Procfile"
-    echo "web: npm start" > $build_dir/Procfile
-  else
-    status "Procfile not found and npm start script is undefined"
-    protip "Create a Procfile or specify a start script in package.json"
-  fi
-fi
+###   # If `scripts.start` is set in package.json, or a server.js file
+###   # is present in the app root, then create a default Procfile
+###   if [ "$npm_start" != "null" ] || [ -f $build_dir/server.js ]; then
+###     status "No Procfile found; Adding npm start to new Procfile"
+###     echo "web: npm start" > $build_dir/Procfile
+###   else
+###     status "Procfile not found and npm start script is undefined"
+###     protip "Create a Procfile or specify a start script in package.json"
+###   fi
+### fi
 
 # Update the PATH
-status "Building runtime environment"
-mkdir -p $build_dir/.profile.d
-echo "export PATH=\"\$HOME/vendor/node/bin:\$HOME/bin:\$HOME/node_modules/.bin:\$PATH\";" > $build_dir/.profile.d/nodejs.sh
+### status "Building runtime environment"
+### mkdir -p $build_dir/.profile.d
+### echo "export PATH=\"\$HOME/vendor/node/bin:\$HOME/bin:\$HOME/node_modules/.bin:\$PATH\";" > $build_dir/.profile.d/nodejs.sh
 
 # Check and run Grunt
 (
@@ -182,3 +184,7 @@ echo "export PATH=\"\$HOME/vendor/node/bin:\$HOME/bin:\$HOME/node_modules/.bin:\
     https://nomnom.heroku.com/?request_id=$REQUEST_ID \
     > /dev/null
 ) &
+
+### Add by shunjikonishi
+rm -rf node_modules
+rm -rf vendor
