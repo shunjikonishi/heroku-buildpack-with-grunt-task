@@ -139,7 +139,8 @@ rm -rf "$build_dir/.npm"
     fi
 
     # make sure that grunt and grunt-cli are installed locally
-    npm install grunt-cli
+    npm install grunt-cli@${GRUNT_CLI_VERSION:-1.2.0}
+    npm install grunt@${GRUNT_VERSION:-^1.0.1}
     npm install
     echo "-----> Found Gruntfile, running grunt heroku:$NODE_ENV task"
     $build_dir/node_modules/.bin/grunt heroku:$NODE_ENV
